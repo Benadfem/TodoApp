@@ -1,6 +1,10 @@
 from database import Base
 from sqlalchemy import Column, Integer, String, Boolean
 
+
+"""
+created the class for the Todos model, identifying each attribute for 
+"""
 class Todos(Base):
     __tablename__ = 'todos'
     id = Column(Integer, primary_key=True, index=True)
