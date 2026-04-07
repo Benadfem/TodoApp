@@ -85,5 +85,21 @@ async def update_todo(db: db_dependency,
     todo_model.completed = todo_request.completed
     todo_model.priority = todo_request.priority
 
-    # db.add(todo_model)
+    db.add(todo_model)
     db.commit()
+
+"""
+    Personal ASSIGNMENT to get the list of todos with the same rating
+    
+"""
+
+@app.get("/todo/priority/{todo_priority}", status_code=status.HTTP_200_OK)
+async def read_todo_by_priority(db: db_dependency,
+                                todo_priority: int = Path(gt=0, lt=6)):
+
+    todo_model = db.query(Todos).filter(Todos.priority == todo_priority).all()
+
+    if todo_model:
+        return todo_model
+
+    raise HTTPException(status_code=404, detail='No todos found with that priority.')
