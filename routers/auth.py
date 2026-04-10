@@ -1,8 +1,12 @@
-from fastapi import APIRouter
-from passlib.context import CryptContext
-from passlib.handlers.bcrypt import bcrypt
-from pydantic import BaseModel
+from typing import Annotated
 
+from fastapi import APIRouter, Depends
+from passlib.context import CryptContext
+from pydantic import BaseModel
+from sqlalchemy.orm import Session
+from starlette import status
+
+from database import SessionLocal
 from models import User
 
 router = APIRouter()
@@ -16,8 +20,21 @@ class CreateUserRequest(BaseModel):
     last_name: str
     roles: str
 
-@router.post("/auth")
-async def create_user(create_user_request: CreateUserRequest):
+"""
+We need to add this user to the database 
+"""
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+# let's create a variable db_dependency to hold the annotation
+db_dependency = Annotated[Session, Depends(get_db)]
+@router.post("/auth", status_code=status.HTTP_201_CREATED)
+async def create_user(db: db_dependency, create_user_request: CreateUserRequest):
     create_user_model = User(
        email=create_user_request.email,
         first_name=create_user_request.first_name,
@@ -26,4 +43,5 @@ async def create_user(create_user_request: CreateUserRequest):
         hashed_password = bcrypt_context.hash(create_user_request.password),
         is_active=True
     )
-    return create_user_model
+    db.add(create_user_model)
+    db.commit()
