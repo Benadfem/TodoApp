@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 """
 the line below holds the location of the database in the app directory 
 """
-SQLALCHEMY_DATABASE_URI = 'sqlite:///./todos.db'
+SQLALCHEMY_DATABASE_URI = 'sqlite:///./todosapp.db'
 
 
 """
