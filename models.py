@@ -4,7 +4,7 @@ from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 """
 let's create a class for the users model this is also called the schema
 """
-class User(Base):
+class Users(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True)
