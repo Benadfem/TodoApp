@@ -1,13 +1,13 @@
 from datetime import timedelta, datetime, timezone
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException
-from jose import jwt
+from jose import jwt, JWTError
 from passlib.context import CryptContext
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from starlette import status
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 
 import models
 from database import SessionLocal
@@ -20,6 +20,7 @@ SECRET_KEY = 'a750047dfaae5e3969e4d6d3be17348fe90525b2406924e330445e5cacba7ce1'
 ALGORITHM = 'HS256'
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl="token")
 
 class CreateUserRequest(BaseModel):
     email: str
@@ -66,6 +67,20 @@ def create_access_token(username: str, user_id :int, expires_delta:timedelta):
     # encode.update({'exp': expires})
     encode.update({'exp': int(expires.timestamp())})
     return jwt.encode(encode,SECRET_KEY,algorithm=ALGORITHM)
+
+async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get('sub')
+        user_id: int = payload.get('id')
+        if username is None or user_id is None:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                                detail="Could not validate User.",)
+        return {'username':username, 'user_id':user_id}
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="Could not validate User.", )
+
 @router.post("/auth", status_code=status.HTTP_201_CREATED)
 async def create_user(db: db_dependency, create_user_request: CreateUserRequest):
     create_user_model = Users(
