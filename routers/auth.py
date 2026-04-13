@@ -4,6 +4,7 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Depends, HTTPException
 from jose import jwt, JWTError
 from passlib.context import CryptContext
+from pyasn1.type import tag
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from starlette import status
@@ -13,7 +14,10 @@ import models
 from database import SessionLocal
 from models import Users
 
-router = APIRouter()
+router = APIRouter(
+    prefix='/auth',
+    tags=['auth']
+)
 
 # This Secret and algorithm for the authorization of user in the application
 SECRET_KEY = 'a750047dfaae5e3969e4d6d3be17348fe90525b2406924e330445e5cacba7ce1'
@@ -81,7 +85,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="Could not validate User.", )
 
-@router.post("/auth", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_user(db: db_dependency, create_user_request: CreateUserRequest):
     create_user_model = Users(
        email=create_user_request.email,
@@ -95,7 +99,7 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
     db.add(create_user_model)
     db.commit()
 
-@router.get("/auth/user")
+@router.get("/user")
 async def get_user(db: db_dependency):
     return db.query(models.Users).all()
 
