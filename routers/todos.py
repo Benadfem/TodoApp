@@ -40,8 +40,8 @@ class TodoRequest(BaseModel):
     priority: int = Field(default=0, gt=0, lt=6)
 
 @router.get("/todo", status_code=status.HTTP_200_OK)
-async def read_all(db: db_dependency):
-    return db.query(models.Todos).all()
+async def read_all(user: user_dependency,db: db_dependency):
+    return db.query(models.Todos).filter(Todos.owner_id == user.get('id')).all()
 
 
 # getting a single info from the database
