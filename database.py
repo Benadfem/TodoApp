@@ -8,7 +8,7 @@ the line below holds the location of the database in the app directory
 SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:Benadfem@localhost/TodoApplicationDatabase'
 
 
-"""
+""" 
 The line below creates the link between python code and the database
 software
 """
