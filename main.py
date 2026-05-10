@@ -13,6 +13,12 @@ since there is model an database connection creation
 """
 models.Base.metadata.create_all(engine)
 
+
+# create a healthy status endpoint
+@app.get("/healthy")
+def health_check():
+    return {"status": "Healthy"}
+
 """
 to see the router from the router package
 """
