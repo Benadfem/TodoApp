@@ -12,7 +12,10 @@ from models import Todos
 from .auth import get_current_user
 
 
-router = APIRouter()
+router = APIRouter(
+    prefix='/todo',
+    tags=['todo']
+)
 
 
 
