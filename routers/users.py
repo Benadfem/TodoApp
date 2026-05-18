@@ -43,7 +43,7 @@ class PhoneNumberVerification(BaseModel):
     phone_number: str
     new_phone_number: str = Field(min_length=11, max_length=11)
 
-@router.get('/', status_code=status.HTTP_200_OK)
+@router.get("/", status_code=status.HTTP_200_OK)
 async def get_user(user: user_dependency, db: db_dependency):
     if user is None:
         raise HTTPException(status_code=401, detail='Authentication failed')

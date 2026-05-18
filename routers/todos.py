@@ -44,7 +44,7 @@ class TodoRequest(BaseModel):
     
 
 
-@router.get("/todo", status_code=status.HTTP_200_OK)
+@router.get("/", status_code=status.HTTP_200_OK)
 async def read_all(user: user_dependency,db: db_dependency):
     return db.query(models.Todos).filter(Todos.owner_id == user.get('id')).all()
 
@@ -62,7 +62,7 @@ async def read_one(db: db_dependency, todo_id: int = Path(gt=0)):
 Now we will have to create a route the will enable the 
 creation of new Todo in todos.db
 """
-@router.post("/todo", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_todo(user: user_dependency,db: db_dependency, todo_request: TodoRequest ):
     if user is None:
         raise HTTPException(status_code=404, detail='Authentication failed ')
